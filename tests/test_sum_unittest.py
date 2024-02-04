@@ -11,6 +11,9 @@ class TestSum(unittest.TestCase):
     
     def test_sum_tuple(self):
         self.assertEqual(sum((1, 2, 6)), 9, "Should be 9")
+        
+    def test_sum_tuple(self):
+        self.assertEqual(sum((1, 2, 7)), 11, "Should be 9")    
 
 if __name__ == '__main__':
     unittest.main()
