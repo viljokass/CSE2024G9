@@ -12,6 +12,9 @@ class TestSum(unittest.TestCase):
     def test_sum_tuple_2(self):
         self.assertEqual(sum((1, 2, 6)), 9, "Should be 9")
 
+    def test_sum_tuple_3(self):
+        self.assertEqual(sum((1, 2, 7)), 10, "Should be 10")
+
     def test_sum_prod(self):
         self.assertEqual(3*3, 9, "Should be 9")
 
