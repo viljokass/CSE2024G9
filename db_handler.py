@@ -1,7 +1,6 @@
 from dotenv import dotenv_values
 from pymongo import MongoClient
 from bson.json_util import dumps
-from models import trade, order
 
 import os
 
