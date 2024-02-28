@@ -5,6 +5,9 @@ from models import trade, order
 
 import os
 
+from models.order import Order
+from models.trade import Trade
+
 
 class DbHandler:
 
