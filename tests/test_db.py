@@ -2,12 +2,11 @@ import os
 import unittest
 import json
 
-from bson import ObjectId
 from dotenv import dotenv_values
 
-import db_handler
-from models.trade import Trade
 from models.order import Order
+from models.trade import Trade
+from db_handler import DbHandler
 
 
 class TestDatabase(unittest.TestCase):
@@ -16,14 +15,14 @@ class TestDatabase(unittest.TestCase):
     def setUp(cls):
         # Change to the test database from the environment variables
         os.environ['db'] = dotenv_values("../.env", ).get('TEST_DB_NAME')
-        cls.test_db = db_handler.DbHandler()
+        cls.test_db = DbHandler()
 
     def test_record_trade(self):
         # Assert that the trade is successfully recorded and retrieved
         trade = Trade(100, 100.00)
         response = self.test_db.record_trade(trade)
         self.assertEqual(response.acknowledged, True)
-        trade_id = ObjectId(response.inserted_id)
+        trade_id = response.inserted_id
         trades_json = self.test_db.get_trades()
         trades_list = json.loads(trades_json)
         self.assertEqual(trades_list[0]['quantity'], trade.quantity, "Should be 100")
@@ -36,7 +35,7 @@ class TestDatabase(unittest.TestCase):
         order = Order('bid', 100, 100.00)
         response = self.test_db.record_order(order)
         self.assertEqual(response.acknowledged, True)
-        order_id = ObjectId(response.inserted_id)
+        order_id = response.inserted_id
         orders_json = self.test_db.get_orders()
         orders_list = json.loads(orders_json)
         self.assertEqual(orders_list[0]['type'], order.type, "Should be bid")
