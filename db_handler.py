@@ -10,14 +10,18 @@ from models.trade import Trade
 
 class DbHandler:
 
-    def __init__(self):
-        """Initialize the database connection"""
+    def __init__(self, client=None):
+        """
+        Initialize the database connection
+        :param client: The client to use for the database connection
+        """
 
-        # If the environment variable is not set for test database, set it to the value in the .env file
-        if os.getenv('db') is None:
+        if client is None:
+            # If the environment variable is not set for the test database, set it to the value in the .env file
             os.environ['db'] = dotenv_values(".env").get('DB_NAME')
-
-        self.db = MongoClient(os.getenv('mongodb_uri'))[os.getenv('db')]
+            self.db = MongoClient(os.getenv('mongodb_uri'))[os.getenv('db')]
+        else:
+            self.db = client
 
     def record_trade(self, trade: Trade):
         """Record a trade in the database"""

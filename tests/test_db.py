@@ -2,8 +2,7 @@ import os
 import sys
 import unittest
 import json
-
-from dotenv import dotenv_values
+from bson import ObjectId
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, project_root)
@@ -11,6 +10,7 @@ sys.path.insert(0, project_root)
 from models.order import Order
 from models.trade import Trade
 from db_handler import DbHandler
+import mongomock
 
 
 class TestDatabase(unittest.TestCase):
@@ -18,15 +18,15 @@ class TestDatabase(unittest.TestCase):
     @classmethod
     def setUp(cls):
         # Change to the test database from the environment variables
-        os.environ['db'] = dotenv_values("../.env", ).get('TEST_DB_NAME')
-        cls.test_db = DbHandler()
+        mock_client = mongomock.MongoClient("testdb")['testdb']
+        cls.test_db = DbHandler(mock_client)
 
     def test_record_trade(self):
         # Assert that the trade is successfully recorded and retrieved
         trade = Trade(100, 100.00)
         response = self.test_db.record_trade(trade)
         self.assertEqual(response.acknowledged, True)
-        trade_id = response.inserted_id
+        trade_id = ObjectId(response.inserted_id)
         trades_json = self.test_db.get_trades()
         trades_list = json.loads(trades_json)
         self.assertEqual(trades_list[0]['quantity'], trade.quantity, "Should be 100")
@@ -39,7 +39,7 @@ class TestDatabase(unittest.TestCase):
         order = Order('bid', 100, 100.00)
         response = self.test_db.record_order(order)
         self.assertEqual(response.acknowledged, True)
-        order_id = response.inserted_id
+        order_id = ObjectId(response.inserted_id)
         orders_json = self.test_db.get_orders()
         orders_list = json.loads(orders_json)
         self.assertEqual(orders_list[0]['type'], order.type, "Should be bid")
@@ -71,5 +71,3 @@ class TestDatabase(unittest.TestCase):
         # Delete all trades and orders from the test database after each test
         self.test_db.delete_trades()
         self.test_db.delete_orders()
-        # Change back to the main database from the environment variables
-        os.environ['db'] = dotenv_values("../.env", ).get('DB_NAME')
