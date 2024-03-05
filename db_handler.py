@@ -1,3 +1,4 @@
+import dotenv
 from dotenv import dotenv_values
 from pymongo import MongoClient
 from bson.json_util import dumps
@@ -18,8 +19,8 @@ class DbHandler:
 
         if client is None:
             # If the environment variable is not set for the test database, set it to the value in the .env file
-            os.environ['db'] = dotenv_values(".env").get('DB_NAME')
-            self.db = MongoClient(os.getenv('mongodb_uri'))[os.getenv('db')]
+            dotenv.load_dotenv()
+            self.db = MongoClient(os.getenv('MONGODB_URI'))[os.getenv('DB_NAME')]
         else:
             self.db = client
 
