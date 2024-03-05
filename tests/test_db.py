@@ -67,6 +67,13 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(response.deleted_count, 1)
         self.assertEqual(self.test_db.get_orders(), "[]")
 
+    def test_record_last_traded_price(self):
+        # Assert that the last traded price is successfully added to the database
+        price = 100.00
+        self.test_db.record_last_traded_price(price)
+        last_traded_price = self.test_db.get_last_traded_price()
+        self.assertEqual(last_traded_price, price)
+
     def tearDown(self):
         # Delete all trades and orders from the test database after each test
         self.test_db.delete_trades()
