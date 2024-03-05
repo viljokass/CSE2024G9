@@ -87,3 +87,18 @@ class DbHandler:
             return dumps(cursor)
         except Exception as e:
             return str(e)
+
+    def record_last_traded_price(self, price: float):
+        """Record the last traded price in the database"""
+        try:
+            return self.db.last_trade.update_one({'_id': 'last_trade'}, {'$set': {'price': price}}, upsert=True)
+        except Exception as e:
+            return str(e)
+
+    def get_last_traded_price(self):
+        """Get the last traded price from the database"""
+        try:
+            cursor = self.db.last_trade.find_one({'_id': 'last_trade'})
+            return cursor['price']
+        except Exception as e:
+            return str(e)
