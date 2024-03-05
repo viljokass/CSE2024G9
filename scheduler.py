@@ -14,7 +14,7 @@ def fetch_last_traded_price():
     url = 'https://api.marketdata.app/v1/stocks/quotes/AAPL/'
     response = requests.get(url)
     
-    if response.status_code != 203:
+    if response.status_code != 200:
         raise Exception('Failed to fetch last traded price')
     
     data = response.json()

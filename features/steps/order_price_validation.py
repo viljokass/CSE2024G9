@@ -14,7 +14,7 @@ def submit_order(context, order, multiplier):
     context.response = context.client.post("/v1/orders", json = {
         "order_type": order,
         "unit_price": unit_price,
-        "quantity" : 100
+        "quantity": 100
     })
     assert context.response
 
