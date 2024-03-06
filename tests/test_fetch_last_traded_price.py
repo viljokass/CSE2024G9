@@ -12,7 +12,7 @@ class TestFetchLastTradedPrice(unittest.TestCase):
     @patch('scheduler.requests.get')
     def test_fetch_last_traded_price_success(self, mock_get):
         mock_response = MagicMock()
-        mock_response.status_code = 203
+        mock_response.status_code = 200
         mock_response.json.return_value = {'last': [180.89]}
         mock_get.return_value = mock_response
         
@@ -31,7 +31,7 @@ class TestFetchLastTradedPrice(unittest.TestCase):
     def test_fetch_last_traded_price_invalid_response_format(self, mock_get):
         with self.assertRaises(Exception):
             mock_response = mock_get.return_value
-            mock_response.status_code = 203
+            mock_response.status_code = 200
             mock_response.json.return_value = {'invalid_key': 180.89}
 
             fetch_last_traded_price()
