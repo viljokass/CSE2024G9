@@ -10,3 +10,7 @@ def before_feature(context, feature):
     app.testing = True
     context.client = app.test_client()
     context.db_handler = db_handler
+
+def after_scenario(context, scenario):
+    context.db_handler.delete_trades()
+    context.db_handler.delete_orders()
