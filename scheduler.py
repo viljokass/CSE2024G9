@@ -1,14 +1,23 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
+import time
+import os
 
 scheduler = BackgroundScheduler()
 scheduler.start()
 
-def schedule_last_traded_price_fetch():
-    last_traded_price = fetch_last_traded_price()
-    #db connection here, add last_traded_price to the db
+start_time = time.time()
 
-scheduler.add_job(schedule_last_traded_price_fetch, 'interval', hours=1)
+def print_time():
+    print(f"{os.path.basename(__file__)} running running for {(time.time() - start_time):.2f} seconds")
+
+def schedule_last_traded_price_fetch(db_handler):
+    last_traded_price = fetch_last_traded_price()
+    db_handler.record_last_traded_price(last_traded_price)
+
+def start_scheduler(db_handler):
+    scheduler.add_job(schedule_last_traded_price_fetch, 'interval', hours=1, args=[db_handler])
+    scheduler.add_job(print_time, 'interval', seconds=10)
 
 def fetch_last_traded_price():
     url = 'https://api.marketdata.app/v1/stocks/quotes/AAPL/'
