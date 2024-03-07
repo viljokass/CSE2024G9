@@ -10,10 +10,13 @@ coverage==7.4.2
 cucumber-tag-expressions==6.1.0
 distlib==0.3.8
 dnspython==2.6.1
+email-validator==2.1.0.post1
 exceptiongroup==1.2.0
 filelock==3.13.1
-flask==3.0.2
+Flask==3.0.2
+flask-mongoengine==1.0.0
 Flask-RESTful==0.3.10
+Flask-WTF==1.2.1
 idna==3.6
 importlib-metadata==7.0.1
 iniconfig==2.0.0
@@ -41,6 +44,7 @@ tzdata==2024.1
 tzlocal==5.2
 urllib3==2.2.1
 virtualenv==20.25.1
-werkzeug==3.0.1
-win-unicode-console==0.5
+Werkzeug==3.0.1
+win_unicode_console==0.5
+WTForms==3.1.2
 zipp==3.17.0

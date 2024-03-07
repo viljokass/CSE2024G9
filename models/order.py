@@ -5,13 +5,13 @@ from typing import Literal
 @dataclass
 class Order:
     """ Order class to represent an order to be traded """
-    type: Literal["bid", "order"]
+    type: Literal["bid", "offer"]
     quantity: int
     price: float
 
     def __post_init__(self):
-        if self.type not in ["bid", "order"]:
-            raise ValueError("Type must be either 'bid' or 'order'")
+        if self.type not in ["bid", "offer"]:
+            raise ValueError("Type must be either 'bid' or 'offer'")
         if self.quantity < 1:
             raise ValueError("Quantity must be greater than 0")
         if self.price < 0:
