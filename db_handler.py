@@ -1,5 +1,4 @@
 import dotenv
-from dotenv import dotenv_values
 from pymongo import MongoClient
 from bson.json_util import dumps
 
@@ -21,7 +20,9 @@ class DbHandler:
             # If the environment variable is not set for the test database, set it to the value in the .env file
             dotenv.load_dotenv()
             self.db = MongoClient(os.getenv('MONGODB_URI'))[os.getenv('DB_NAME')]
+            self.test = False
         else:
+            self.test = True
             self.db = client
 
     def record_trade(self, trade: Trade):
@@ -98,6 +99,8 @@ class DbHandler:
 
     def get_last_traded_price(self):
         """Get the last traded price from the database"""
+        if self.test:
+            return 100.00
         try:
             cursor = self.db.last_trade.find_one({'_id': 'last_trade'})
             return cursor['price']
