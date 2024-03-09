@@ -1,3 +1,4 @@
+import json
 from flask import Flask
 from flask_restful import reqparse, Api, Resource
 from db_handler import DbHandler
@@ -45,11 +46,24 @@ class OrderEndPoint(Resource):
         # Create a data object
         order = Order(type=order_type, price=unit_price, quantity=quantity)
         # Add order to the database
+        self.create_trades(order)
         self.db_handler.record_order(order)
 
         # Return a proper response to the sender
         return {"message": "Order received and recorded"}, 201
+    
+    def create_trades(self, order):
+        orders_json = self.db_handler.get_orders()
+        orders = json.loads(orders_json)
+        if len(orders) == 0:
+            return
+        if order.type == "bid":
+            orders_by_lowest_price = sorted(orders, key=lambda x: x['price'])
+            for existing_order in orders:
+                if order.price >= existing_order['price']:
+                    return
 
+        
 # Endpoint for getting trades
 class TradeEndPoint(Resource):
 
