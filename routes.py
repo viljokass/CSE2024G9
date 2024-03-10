@@ -45,8 +45,8 @@ class OrderEndPoint(Resource):
         # Create a data object
         try:
             order = Order(type=order_type, price=unit_price, quantity=quantity)
-        except ValueError as e:
-            return {"message": str(e)}, 406
+        except ValueError:
+            return {"message": "Order rejected - Quantity error"}, 406
 
         # Add order to the database
         self.db_handler.record_order(order)

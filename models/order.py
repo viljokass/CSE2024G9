@@ -14,6 +14,8 @@ class Order:
             raise ValueError("Type must be either 'bid' or 'offer'")
         if self.quantity < 1:
             raise ValueError("Quantity must be greater than 0")
+        if self.quantity is not int:
+            raise ValueError("Quantity must be an integer")
         if self.price < 0:
             raise ValueError("Price must be greater than or equal to 0")
 
