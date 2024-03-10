@@ -131,7 +131,7 @@ class TradeEndPoint(Resource):
 
     def get(self):
         # Fetch the trade information from the database
-        return self.db_handler.get_trades(), 200
+        return json.loads(self.db_handler.get_trades()), 200
 
 # Create app with a database handler
 def create_app(db_handler: DbHandler):
