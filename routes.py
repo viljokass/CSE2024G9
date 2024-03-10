@@ -1,7 +1,11 @@
+import json
+
+from bson import ObjectId
 from flask import Flask
 from flask_restful import reqparse, Api, Resource
 from db_handler import DbHandler
 from models.order import Order
+from models.trade import Trade
 
 # Create the parser object to be used in the order end point
 parser = reqparse.RequestParser()
@@ -41,22 +45,83 @@ class OrderEndPoint(Resource):
         # Check data validity using AAPL trade price
         last_traded_price = self.db_handler.get_last_traded_price()
         if (unit_price < 0.90 * last_traded_price):
-            return {"message": "Price too low - must be within 10% of the last traded price."}, 406
+            return {"message": f"Price too low - must be within 10% of the last traded price, which is {last_traded_price}"}, 406
         if (unit_price > 1.10 * last_traded_price):
-            return {"message": "Price too high - must be within 10% of the last traded price."}, 406
+            return {"message": f"Price too high - must be within 10% of the last traded price, which is {last_traded_price}"}, 406
 
         # Create a data object
         try:
             order = Order(type=order_type, price=unit_price, quantity=quantity)
         except ValueError:
             return {"message": "Order rejected - Quantity error"}, 406
-
-        # Add order to the database
-        self.db_handler.record_order(order)
+        
+        self.create_trades(order)
+        if order.quantity != 0:
+            # Add order to the database
+            self.db_handler.record_order(order)
 
         # Return a proper response to the sender
         return {"message": "Order received and recorded"}, 201
+    
+    def create_trades(self, order):
+        orders_json = self.db_handler.get_orders()
+        orders = json.loads(orders_json)
 
+        if len(orders) == 0:
+            return
+        
+        matching_orders = self.get_matching_orders(orders, order.type, order.price)
+        
+        if len(matching_orders) == 0:
+            return
+        
+        for matched_order in matching_orders:
+            if order.quantity == 0:
+                return
+            self.create_trade(order, matched_order)
+        
+    def get_matching_orders(self, orders, order_type, order_price):
+        # exclude orders of the same type as the new order
+        filtered_orders = [order for order in orders if order['type'] != order_type]
+        
+        matching_orders = []
+
+        if order_type == "bid":
+            orders_by_lowest_price = sorted(filtered_orders, key=lambda order: order['price'])
+            for order in orders_by_lowest_price:
+                if order_price >= order['price']:
+                    matching_orders.append(order)
+
+        if order_type == "offer":
+            orders_by_highest_price = sorted(filtered_orders, key=lambda order: order['price'], reverse=True)
+            for order in orders_by_highest_price:
+                if order_price <= order['price']:
+                    matching_orders.append(order)
+            
+        return matching_orders
+    
+    def create_trade(self, order, matched_order):
+        highest_price = max(order.price, matched_order['price'])
+        lowest_quantity = min(order.quantity, matched_order['quantity'])
+            
+        trade = Trade(
+            price=highest_price,
+            quantity=lowest_quantity)
+            
+        self.db_handler.record_trade(trade)
+
+        matched_order_id = matched_order['_id']['$oid']
+        order_id_object_id = ObjectId(matched_order_id)
+        if lowest_quantity == matched_order['quantity']:
+            self.db_handler.delete_order(order_id_object_id)
+            order.quantity -= matched_order['quantity']
+        else: 
+            updated_quantity = matched_order['quantity'] - order.quantity
+            self.db_handler.update_order(order_id_object_id, updated_quantity)
+            order.quantity = 0
+
+
+        
 # Endpoint for getting trades
 class TradeEndPoint(Resource):
 

@@ -39,7 +39,7 @@ class DbHandler:
         except Exception as e:
             return str(e)
 
-    def delete_trade(self, trade_id: str):
+    def delete_trade(self, trade_id):
         """Delete a trade from the database by its id"""
         try:
             return self.db.trades.delete_one({'_id': trade_id})
@@ -60,7 +60,7 @@ class DbHandler:
         except Exception as e:
             return str(e)
 
-    def delete_order(self, order_id: str):
+    def delete_order(self, order_id):
         """Delete an order from the database by its id"""
         try:
             return self.db.orders.delete_one({'_id': order_id})
@@ -74,7 +74,7 @@ class DbHandler:
         except Exception as e:
             return str(e)
 
-    def update_order(self, order_id: str, quantity: int):
+    def update_order(self, order_id, quantity: int):
         """Update the quantity of an order"""
         try:
             return self.db.orders.update_one({'_id': order_id}, {'$set': {'quantity': quantity, }})
