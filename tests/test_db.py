@@ -47,6 +47,20 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(orders_list[0]['price'], order.price, "Should be 100.00")
         self.assertEqual(orders_list[0]['_id']['$oid'], str(order_id), "Should be the same")
 
+    def test_update_order(self):
+        # Assert that the order is successfully updated
+        order = Order('bid', 100, 100.00)
+        order2 = Order('bid', 100, 100.00)
+        response = self.test_db.record_order(order)
+        order_id = response.inserted_id
+        response2 = self.test_db.record_order(order2)
+        order_id2 = response2.inserted_id
+        response = self.test_db.update_order(order_id, 200)
+        self.assertEqual(response.acknowledged, True)
+        orders_json = self.test_db.get_orders()
+        orders_list = json.loads(orders_json)
+        self.assertEqual(orders_list[0]['quantity'], 200, "Should be 200")
+
     def test_delete_trade(self):
         # Assert that a trade is successfully deleted
         trade = Trade(100, 100.00)

@@ -26,10 +26,13 @@ class OrderEndPoint(Resource):
         # Parse the arguments from the data
         arguments = parser.parse_args()
 
-        # get the data from arguments
-        order_type  = arguments["type"].lower()
-        unit_price  = round(arguments["price"], 2)
-        quantity    = arguments["quantity"]
+        # get the data from arguments'
+        try:
+            order_type  = arguments["type"].lower()
+            unit_price  = round(arguments["price"], 2)
+            quantity    = arguments["quantity"]
+        except ValueError:
+            return {"message": "Order rejected - Invalid input"}, 406
 
         # If order type is not Offer or Bid, return an error
         if (order_type not in ["offer", "bid"]):

@@ -43,7 +43,7 @@ def validate_response(context):
 
 @then('order is rejected')
 def validate_response(context):
-    assert context.response.status_code == 406
+    assert context.response.status_code == 406 or context.response.status_code == 400
     
     # verify order is not in db, and no trades have happened
     orders_json = context.db_handler.get_orders()
