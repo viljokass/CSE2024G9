@@ -30,10 +30,13 @@ class OrderEndPoint(Resource):
         # Parse the arguments from the data
         arguments = parser.parse_args()
 
-        # get the data from arguments
-        order_type  = arguments["type"].lower()
-        unit_price  = round(arguments["price"], 2)
-        quantity    = arguments["quantity"]
+        # get the data from arguments'
+        try:
+            order_type  = arguments["type"].lower()
+            unit_price  = round(arguments["price"], 2)
+            quantity    = arguments["quantity"]
+        except ValueError:
+            return {"message": "Order rejected - Invalid input"}, 406
 
         # If order type is not Offer or Bid, return an error
         if (order_type not in ["offer", "bid"]):
@@ -47,7 +50,10 @@ class OrderEndPoint(Resource):
             return {"message": f"Price too high - must be within 10% of the last traded price, which is {last_traded_price}"}, 406
 
         # Create a data object
-        order = Order(type=order_type, price=unit_price, quantity=quantity)
+        try:
+            order = Order(type=order_type, price=unit_price, quantity=quantity)
+        except ValueError:
+            return {"message": "Order rejected - Quantity error"}, 406
         
         self.create_trades(order)
         if order.quantity != 0:
