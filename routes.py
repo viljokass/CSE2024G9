@@ -43,7 +43,11 @@ class OrderEndPoint(Resource):
             return {"message": "Price too high - must be within 10% of the last traded price."}, 406
 
         # Create a data object
-        order = Order(type=order_type, price=unit_price, quantity=quantity)
+        try:
+            order = Order(type=order_type, price=unit_price, quantity=quantity)
+        except ValueError as e:
+            return {"message": str(e)}, 406
+
         # Add order to the database
         self.db_handler.record_order(order)
 
