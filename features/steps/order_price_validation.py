@@ -3,20 +3,20 @@ from behave import *
 from scheduler import fetch_last_traded_price
 
 
-@given('current market last trade price is M1')
-def get_last_traded_price(context):
-    price = 100.00
+@given('current market last trade price is "{market_price}" as M1')
+def get_last_traded_price(context, market_price):
+    price = float(market_price)
     context.db_handler.record_last_traded_price(price)
     context.last_traded_price = context.db_handler.get_last_traded_price()
     assert context.last_traded_price == price
 
 
-@when('I submit "{order}" with price of M1 x "{multiplier}"')
-def submit_order(context, order, multiplier):
+@when('I submit "{order}" with price of M1 x "{multiplier}" with quantity of "{quantity}"')
+def submit_order(context, order, multiplier, quantity):
     price = context.last_traded_price * float(multiplier)
     context.order_type = order
     context.order_price = price
-    context.order_quantity = 100
+    context.order_quantity = int(quantity)
     context.response = context.client.post("/v1/orders", json = {
         "type": context.order_type,
         "price": context.order_price,
