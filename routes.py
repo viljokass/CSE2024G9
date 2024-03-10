@@ -1,4 +1,6 @@
 import json
+
+from bson import ObjectId
 from flask import Flask
 from flask_restful import reqparse, Api, Resource
 from db_handler import DbHandler
@@ -102,15 +104,14 @@ class OrderEndPoint(Resource):
             
         self.db_handler.record_trade(trade)
 
-        matched_order_id = str(matched_order['_id']['$oid'])
+        matched_order_id = matched_order['_id']['$oid']
+        order_id_object_id = ObjectId(matched_order_id)
         if lowest_quantity == matched_order['quantity']:
-            # TODO deleting order does not work
-            self.db_handler.delete_order(matched_order_id)
+            self.db_handler.delete_order(order_id_object_id)
             order.quantity -= matched_order['quantity']
         else: 
             updated_quantity = matched_order['quantity'] - order.quantity
-            # TODO updating order does not work
-            self.db_handler.update_order(matched_order_id, updated_quantity)
+            self.db_handler.update_order(order_id_object_id, updated_quantity)
             order.quantity = 0
 
 
