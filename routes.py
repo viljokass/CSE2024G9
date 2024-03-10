@@ -6,6 +6,7 @@ from flask_restful import reqparse, Api, Resource
 from db_handler import DbHandler
 from models.order import Order
 from models.trade import Trade
+from datetime import datetime
 
 # Create the parser object to be used in the order end point
 parser = reqparse.RequestParser()
@@ -131,7 +132,10 @@ class TradeEndPoint(Resource):
 
     def get(self):
         # Fetch the trade information from the database
-        return self.db_handler.get_trades(), 200
+        trades = json.loads(self.db_handler.get_trades())
+        # Sort the trade data by time in ascending order
+        trades = sorted(trades, key=lambda x: x['time']['$date'])
+        return trades, 200
 
 # Create app with a database handler
 def create_app(db_handler: DbHandler):
