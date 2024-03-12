@@ -134,3 +134,26 @@ def test_post(client):
         "quantity": 23,
     })
     assert response.status_code == 400
+
+def test_order_matching(client):
+
+    db_handler.delete_orders()
+    db_handler.delete_trades()
+    db_handler.record_last_traded_price(100.0)
+
+    ## Data OK (Offer, not compliant to the 10%)
+    client.post("/v1/orders", json = {
+        "type": "offer",
+        "price": 100.0,
+        "quantity" : 69
+    })
+
+    client.post("/v1/orders", json = {
+        "type": "bid",
+        "price": 100.0,
+        "quantity" : 69
+    })
+
+    response = client.get("/v1/trades")
+    assert response.status_code == 200
+    assert b"100.0" in response.data
