@@ -4,7 +4,8 @@ from typing import Literal
 
 @dataclass
 class Order:
-    """ Order class to represent an order to be traded """
+    """Order class to represent an order to be traded"""
+
     type: Literal["bid", "offer"]
     quantity: int
     price: float
@@ -19,7 +20,7 @@ class Order:
 
     def json(self) -> dict:
         return {
-            'type': self.type,
-            'quantity': self.quantity,
-            'price': self.price,
+            "type": self.type,
+            "quantity": self.quantity,
+            "price": self.price,
         }
