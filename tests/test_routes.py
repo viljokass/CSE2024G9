@@ -131,13 +131,13 @@ def test_post(client):
     )
     assert response.status_code == 400
 
-
 # Like in the examples in the Project Details
 def test_order_matching(client):
 
     db_handler.delete_orders()
     db_handler.delete_trades()
     db_handler.record_last_traded_price(190.0)
+
 
     client.post("/v1/orders", json={"type": "bid", "price": 200.0, "quantity": 1000})
 
