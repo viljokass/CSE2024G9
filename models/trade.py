@@ -4,7 +4,8 @@ from datetime import datetime
 
 @dataclass
 class Trade:
-    """ Trade class to represent a made trade """
+    """Trade class to represent a made trade"""
+
     quantity: int
     price: float
     time: datetime = field(default_factory=datetime.now)
@@ -16,9 +17,4 @@ class Trade:
             raise ValueError("Price must be greater than or equal to 0")
 
     def json(self) -> dict:
-        return {
-            'quantity': self.quantity,
-            'price': self.price,
-            'time': self.time
-        }
-
+        return {"quantity": self.quantity, "price": self.price, "time": self.time}

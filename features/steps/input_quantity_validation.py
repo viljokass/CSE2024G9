@@ -1,5 +1,3 @@
-import json
-
 from behave import *
 
 
@@ -16,9 +14,12 @@ def submit_order(context, order, price, quantity):
     context.order_type = order
     context.order_price = price
     context.order_quantity = quantity
-    context.response = context.client.post("/v1/orders", json={
-        "type": context.order_type,
-        "price": context.order_price,
-        "quantity": context.order_quantity
-    })
+    context.response = context.client.post(
+        "/v1/orders",
+        json={
+            "type": context.order_type,
+            "price": context.order_price,
+            "quantity": context.order_quantity,
+        },
+    )
     assert context.response
