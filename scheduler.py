@@ -22,14 +22,10 @@ def schedule_last_traded_price_fetch(db_handler):
 
 
 def start_scheduler(db_handler):
-    if not isinstance(db_handler.get_last_traded_price(), numbers.Number):
-        last_traded_price = fetch_last_traded_price()
-        db_handler.record_last_traded_price(last_traded_price)
-
-    scheduler.add_job(
-        schedule_last_traded_price_fetch, "interval", hours=1, args=[db_handler]
-    )
-    scheduler.add_job(print_time, "interval", seconds=10)
+    if (not isinstance(db_handler.get_last_traded_price(), numbers.Number)):
+        schedule_last_traded_price_fetch(db_handler)
+    scheduler.add_job(schedule_last_traded_price_fetch, 'interval', hours=1, args=[db_handler])
+    scheduler.add_job(print_time, 'interval', seconds=10)
 
 
 def fetch_last_traded_price():
