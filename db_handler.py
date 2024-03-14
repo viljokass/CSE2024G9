@@ -1,5 +1,4 @@
 import dotenv
-from dotenv import dotenv_values
 from pymongo import MongoClient
 from bson.json_util import dumps
 
@@ -18,9 +17,11 @@ class DbHandler:
         """
 
         if client is None:
-            # If the environment variable is not set for the test database, set it to the value in the .env file
+            # If the environment variable is not set for the test database,
+            # set it to the value in the .env file
             dotenv.load_dotenv()
-            self.db = MongoClient(os.getenv('MONGODB_URI'))[os.getenv('DB_NAME')]
+            self.db = MongoClient(os.getenv("MONGODB_URI"))
+            [os.getenv("DB_NAME")]
         else:
             self.db = client
 
@@ -42,7 +43,7 @@ class DbHandler:
     def delete_trade(self, trade_id):
         """Delete a trade from the database by its id"""
         try:
-            return self.db.trades.delete_one({'_id': trade_id})
+            return self.db.trades.delete_one({"_id": trade_id})
         except Exception as e:
             return str(e)
 
@@ -63,7 +64,7 @@ class DbHandler:
     def delete_order(self, order_id):
         """Delete an order from the database by its id"""
         try:
-            return self.db.orders.delete_one({'_id': order_id})
+            return self.db.orders.delete_one({"_id": order_id})
         except Exception as e:
             return str(e)
 
@@ -77,7 +78,14 @@ class DbHandler:
     def update_order(self, order_id, quantity: int):
         """Update the quantity of an order"""
         try:
-            return self.db.orders.update_one({'_id': order_id}, {'$set': {'quantity': quantity, }})
+            return self.db.orders.update_one(
+                {"_id": order_id},
+                {
+                    "$set": {
+                        "quantity": quantity,
+                    }
+                },
+            )
         except Exception as e:
             return str(e)
 
@@ -92,14 +100,16 @@ class DbHandler:
     def record_last_traded_price(self, price: float):
         """Record the last traded price in the database"""
         try:
-            return self.db.last_trade.update_one({'_id': 'last_trade'}, {'$set': {'price': price}}, upsert=True)
+            return self.db.last_trade.update_one(
+                {"_id": "last_trade"}, {"$set": {"price": price}}, upsert=True
+            )
         except Exception as e:
             return str(e)
 
     def get_last_traded_price(self):
         """Get the last traded price from the database"""
         try:
-            cursor = self.db.last_trade.find_one({'_id': 'last_trade'})
-            return cursor['price']
+            cursor = self.db.last_trade.find_one({"_id": "last_trade"})
+            return cursor["price"]
         except Exception as e:
             return str(e)
