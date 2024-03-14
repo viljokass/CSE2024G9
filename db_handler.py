@@ -20,8 +20,7 @@ class DbHandler:
             # If the environment variable is not set for the test database,
             # set it to the value in the .env file
             dotenv.load_dotenv()
-            self.db = MongoClient(os.getenv("MONGODB_URI"))
-            [os.getenv("DB_NAME")]
+            self.db = MongoClient(os.getenv("MONGODB_URI"))[os.getenv("DB_NAME")]
         else:
             self.db = client
 
