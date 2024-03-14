@@ -2,7 +2,9 @@ import json
 import numbers
 
 from bson import ObjectId
-from flask import Flask
+from flask import Flask, jsonify, request
+from flasgger import Swagger, LazyString, LazyJSONEncoder
+from flasgger import swag_from
 from flask_restful import reqparse, Api, Resource
 from db_handler import DbHandler
 from models.order import Order
@@ -30,6 +32,7 @@ class OrderEndPoint(Resource):
     def __init__(self, db_handler: DbHandler):
         self.db_handler = db_handler
 
+    @swag_from("swagger_ui/post_orders.yml", methods=['POST'])
     def post(self):
         # Parse the arguments from the data
         arguments = parser.parse_args()
@@ -140,6 +143,7 @@ class TradeEndPoint(Resource):
     def __init__(self, db_handler: DbHandler):
         self.db_handler = db_handler
 
+    @swag_from("swagger_ui/get_trades.yml", methods=['GET'])
     def get(self):
         # Fetch the trade information from the database
         trades = json.loads(self.db_handler.get_trades())
@@ -148,15 +152,40 @@ class TradeEndPoint(Resource):
         return trades, 200
 
 
+swagger_template = {
+"info": {
+    'title': 'CSE2024G9'
+    },
+    "host": "127.0.0.1:5000"
+}
+
+swagger_config = {
+    "headers": [],
+    "specs": [
+        {
+            "endpoint": 'get',
+            "route": '/v1/api',
+            "rule_filter": lambda rule: True,
+            "model_filter": lambda tag: True,
+        }
+    ],
+    "static_url_path": "/flasgger_static",
+    "swagger_ui": True,
+    "specs_route": "/api"
+}
+
 # Create app with a database handler
 def create_app(db_handler: DbHandler):
     app = Flask(__name__)
+
+    swagger = Swagger(app, template=swagger_template, config=swagger_config)
     api = Api(app)
     # Add the endpoints and the db_handler to the API
     api.add_resource(
         OrderEndPoint, "/v1/orders", resource_class_kwargs={"db_handler": db_handler}
     )
 
+    
     api.add_resource(
         TradeEndPoint, "/v1/trades", resource_class_kwargs={"db_handler": db_handler}
     )
