@@ -1,4 +1,5 @@
 import json
+import numbers
 
 from bson import ObjectId
 from flask import Flask
@@ -45,6 +46,8 @@ class OrderEndPoint(Resource):
 
         # Check data validity using AAPL trade price
         last_traded_price = self.db_handler.get_last_traded_price()
+        if (not isinstance(last_traded_price, numbers.Number)):
+            return {"message": "Unable to fetch the last traded price"}, 500
         if (unit_price < 0.90 * last_traded_price):
             return {"message": f"Price too low - must be within 10% of the last traded price, which is {last_traded_price}"}, 406
         if (unit_price > 1.10 * last_traded_price):
